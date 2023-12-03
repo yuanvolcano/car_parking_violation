@@ -7,7 +7,10 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    NutButton: typeof import('@nutui/nutui-taro')['Button']
-    NutToast: typeof import('@nutui/nutui-taro')['Toast']
+    FilterType: typeof import('./src/components/filterType/index.vue')['default']
+    NutAvatar: typeof import('@nutui/nutui-taro')['Avatar']
+    NutList: typeof import('@nutui/nutui-taro')['List']
+    PersonInfo: typeof import('./src/components/personInfo/index.vue')['default']
+    PostItem: typeof import('./src/components/postItem/index.vue')['default']
   }
 }
