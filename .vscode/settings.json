@@ -1,0 +1,63 @@
+{
+  "editor.formatOnType": true,
+  "editor.formatOnSave": false,
+  "[vue]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "editor.tabSize": 2,
+  "editor.formatOnPaste": true,
+  "css.lint.propertyIgnoredDueToDisplay": "ignore",
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  },
+  "files.associations": {
+    "editor.snippetSuggestions": "top"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "i18n-ally.localesPaths": "locales",
+  "i18n-ally.keystyle": "nested",
+  "i18n-ally.sortKeys": true,
+  "i18n-ally.namespace": true,
+  "i18n-ally.pathMatcher": "{locale}/{namespaces}.{ext}",
+  "i18n-ally.enabledParsers": ["json", "ts", "js"],
+  "i18n-ally.sourceLanguage": "en-US",
+  "i18n-ally.displayLanguage": "zh-CN",
+  "i18n-ally.enabledFrameworks": ["vue"],
+  "cSpell.words": [
+    "adset",
+    "APPLOVIN",
+    "Axios",
+    "Daba",
+    "Dayparting",
+    "deeplink",
+    "echarts",
+    "iconfont",
+    "Iconify",
+    "instream",
+    "IRONSOURCE",
+    "KWAI",
+    "maxlength",
+    "mediacenter",
+    "MINTEGRAL",
+    "PBIA",
+    "PCIA",
+    "pinia",
+    "ROAS",
+    "scroller",
+    "SKADNETWORK",
+    "TARGETINGS",
+    "tiktok",
+    "unref",
+    "upsell",
+    "VITE",
+    "vueuse",
+    "VUNGLE"
+  ]
+}
