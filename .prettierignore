@@ -1,0 +1,15 @@
+public
+dist
+*.d.ts
+/src/assets
+package.json
+.eslintrc.js
+.prettierrc.js
+commitlint.config.js
+postcss.config.js
+tailwind.config.js
+stylelint.config.js
+mtp.js
+tinypngMd5Record.json
+tinypngReport.json
+.vscode/*
