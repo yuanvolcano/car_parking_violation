@@ -50,15 +50,18 @@ function clickHandle(item: ILabelValue) {
 <style lang="scss" module>
 .filterTypeContainer {
   display: flex;
-  font-size: 32px;
+  font-size: 32rpx;
 
   .filterItem {
-    margin-right: 30px;
-    padding: 10px;
+    padding: 10rpx 15rpx;
     color: #666;
 
+    &:first-child {
+      margin-right: 20rpx;
+    }
+
     &.active {
-      border-radius: 10px;
+      border-radius: 10rpx;
       background: rgba(216, 216, 216, 0.2);
       color: #d8d8d8;
     }

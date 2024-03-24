@@ -60,7 +60,7 @@
     "@vue/eslint-config-prettier": "^8.0.0",
     "lint-staged": "13.2.3",
     "listr2": "5.0.8",
-    "lodash-unified": "^1.0.3",
+    "lodash-es": "^4.17.21",
     "vue": "^3.2.40"
   },
   "devDependencies": {

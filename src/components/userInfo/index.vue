@@ -2,10 +2,10 @@
 import { computed, useCssModule } from 'vue';
 
 import avatarSrc from '@/assets/qiubilong.jpeg';
-import { format } from '@/utils/common.ts';
+import { format } from '@/utils/common';
 
 defineOptions({
-  name: 'PersonInfo',
+  name: 'UserInfo',
 });
 
 interface IProps {
@@ -32,10 +32,10 @@ const url = computed(() => {
 
 <template>
   <view :class="$style.infoContainer">
-    <nut-avatar :class="$style.avator" size="normal">
+    <nut-avatar :class="$style.avatar" size="normal">
       <img :src="url" alt="" />
     </nut-avatar>
-    <view :class="$style.personInfo">
+    <view :class="$style.userInfo">
       <view :class="$style.name">{{ nickName }}</view>
       <view :class="$style.carInfo">{{ realCarInfo }}</view>
     </view>
@@ -46,26 +46,28 @@ const url = computed(() => {
 .infoContainer {
   display: flex;
   flex: 1 1;
-  margin-right: 20px;
   align-items: center;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 20rpx;
+  border-radius: 20rpx;
 
-  .avator {
+  .avatar {
+    width: 64rpx;
+    height: 64rpx;
   }
 
-  .personInfo {
-    margin-left: 20px;
+  .userInfo {
+    margin-left: 20rpx;
     text-align: left;
 
     .name {
-      font-size: 40px;
+      font-size: 40rpx;
       line-height: 1.5;
       font-weight: 600;
       color: rgba(125, 125, 125, 1);
     }
+
     .carInfo {
-      font-size: 20px;
+      font-size: 24rpx;
       line-height: 1.5;
     }
   }

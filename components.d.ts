@@ -10,7 +10,7 @@ declare module '@vue/runtime-core' {
     FilterType: typeof import('./src/components/filterType/index.vue')['default']
     NutAvatar: typeof import('@nutui/nutui-taro')['Avatar']
     NutList: typeof import('@nutui/nutui-taro')['List']
-    PersonInfo: typeof import('./src/components/personInfo/index.vue')['default']
     PostItem: typeof import('./src/components/postItem/index.vue')['default']
+    UserInfo: typeof import('./src/components/userInfo/index.vue')['default']
   }
 }

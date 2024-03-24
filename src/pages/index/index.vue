@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref, useCssModule, computed, onBeforeMount } from 'vue';
 
+import addIconSvg from '@/assets/add.svg';
 import FilterType from '@/components/filterType/index.vue';
-import PersonInfo from '@/components/personInfo/index.vue';
 import PostItem from '@/components/postItem/index.vue';
+import UserInfo from '@/components/userInfo/index.vue';
 import { IPostItem } from '@/types/types';
 
 defineOptions({
@@ -12,7 +13,7 @@ defineOptions({
 
 const $style = useCssModule();
 
-const personInfo = reactive({
+const userInfo = reactive({
   headImgUrl: '',
   nickName: '张三',
   carInfo: '五菱宏光',
@@ -46,7 +47,7 @@ function getList() {
       carInfo: '车辆信息',
       driveYear: 1, // 驾龄
       location: '广州', // 文章发表位置
-      content: '文章内容',
+      content: '周日早上7点59分在泰安北路被抄牌了，各位兄弟们记得避坑啊！！！！！！！！',
       createTime: 'yyyy-MM-dd',
       fileUrlList: ['', ''],
       likeNum: 100, // 点赞数量
@@ -61,7 +62,7 @@ function getList() {
       carInfo: '车辆信息',
       driveYear: 2, // 驾龄
       location: '佛山', // 文章发表位置
-      content: '文章内容',
+      content: '周日早上7点59分在泰安北路被抄牌了，各位兄弟们记得避坑啊！！！！！！！！',
       createTime: 'yyyy-MM-dd',
       fileUrlList: ['', ''],
       likeNum: 100, // 点赞数量
@@ -83,11 +84,11 @@ onBeforeMount(() => {
   <view :class="$style.index">
     <!-- 入口 -->
     <view :class="$style.baseInfo">
-      <PersonInfo v-bind="personInfo" :class="$style.infoContainer" />
+      <UserInfo v-bind="userInfo" :class="$style.infoContainer" />
       <view :class="$style.uploadEntry">
         <view :class="$style.upload">
           <view :class="$style.uploadText">{{ uploadInfo.text }}</view>
-          <Add />
+          <img :class="$style.addSvg" :src="addIconSvg" />
         </view>
         <view :class="$style.uploadSum">{{ uploadSumText }}</view>
       </view>
@@ -114,51 +115,59 @@ onBeforeMount(() => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 20px;
+  padding: 20rpx;
 
   .baseInfo {
     display: flex;
+    justify-content: space-around;
 
     .infoContainer {
       background: rgba(216, 216, 216, 0.2);
+      margin-right: 20rpx;
     }
 
     .uploadEntry {
-      padding: 10px;
       flex: 1 1;
-      text-align: left;
+      padding: 20rpx;
       background: rgba(216, 216, 216, 0.2);
-      border-radius: 10px;
+      text-align: left;
+      border-radius: 10rpx;
 
       .upload {
         display: flex;
         align-items: center;
 
         .uploadText {
-          font-size: 40px;
+          font-size: 40rpx;
           line-height: 1.5;
-          margin-right: 20px;
+          margin-right: 20rpx;
           font-weight: 600;
           color: rgba(125, 125, 125, 1);
         }
+
+        .addSvg {
+          width: 40rpx;
+          height: 40rpx;
+          font-size: 40rpx;
+        }
       }
       .uploadSum {
-        font-size: 20px;
+        font-size: 24rpx;
         line-height: 1.5;
       }
     }
   }
 
   .filterType {
-    margin-top: 20px;
+    margin-top: 20rpx;
   }
 
   .postList {
     flex: 1 1;
 
     .postItem {
-      margin-bottom: 20px;
-      border-radius: 10px;
+      margin-bottom: 20rpx;
+      border-radius: 10rpx;
 
       &:last-child {
         margin-bottom: 0;
