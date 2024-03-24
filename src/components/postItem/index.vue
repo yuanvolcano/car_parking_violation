@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { Addfollow } from '@nutui/icons-vue-taro';
+import { Heart1, HeartFill } from '@nutui/icons-vue-taro';
 import { pick } from 'lodash-es';
 import { computed, useCssModule } from 'vue';
 
 import opposeUrl from '@/assets/oppose.svg';
 import avatarSrc from '@/assets/qiubilong.jpeg';
 import UserInfo from '@/components/userInfo/index.vue';
-import { IPostItem } from 'src/types/types';
+import { ELikeOp, IPostItem } from '@/types/types';
 
 defineOptions({
   name: 'PostItem',
 });
 
-const props = defineProps<IPostItem>();
+const props = defineProps<{
+  item: IPostItem;
+}>();
+
+const emits = defineEmits<{
+  click: [val: { likeType: ELikeOp; post: IPostItem }];
+}>();
 
 const userInfo = computed(() => {
   return pick(props, ['headImgUrl', 'nickName', 'carInfo', 'driveYear']);
@@ -23,25 +29,37 @@ const $style = useCssModule();
 const likeText = '真实';
 
 const unlikeText = '虚假';
+
+function handleClick(type: ELikeOp) {
+  let op = ELikeOp.LIKE;
+  if (type === ELikeOp.LIKE) {
+    op = props.item.isLike ? ELikeOp.CANCEL_LIKE : ELikeOp.LIKE;
+  } else {
+    op = props.item.isUnlike ? ELikeOp.CANCEL_UNLIKE : ELikeOp.UNLIKE;
+  }
+
+  emits('click', { likeType: op, post: props.item });
+}
 </script>
 
 <template>
   <view :class="$style.postItem">
     <UserInfo v-bind="userInfo" />
-    <view :class="$style.content">{{ content }}</view>
+    <view :class="$style.content">{{ item.content }}</view>
     <view :class="$style.imgContainer">
-      <img :class="$style.imgItem" v-for="imgItem in fileUrlList" :key="imgItem" :src="imgItem || avatarSrc" />
+      <img :class="$style.imgItem" v-for="imgItem in item.fileUrlList" :key="imgItem" :src="imgItem || avatarSrc" />
     </view>
     <view :class="$style.feedback">
-      <view :class="$style.time">{{ createTime }} {{ location }}</view>
+      <view :class="$style.time">{{ item.createTime }} {{ item.location }}</view>
       <view :class="$style.likeOrUnlike">
-        <view :class="$style.like">
+        <view :class="$style.like" @click="handleClick(ELikeOp.UNLIKE)">
           <img :class="$style.opposeImg" :src="opposeUrl" />
-          <view>{{ `${unlikeText} +${likeNum}` }}</view>
+          <view>{{ `${likeText} +${item.unLikeNum}` }}</view>
         </view>
-        <view :class="$style.like">
-          <Addfollow />
-          <view>{{ `${likeText} +${unLikeNum}` }}</view>
+        <view :class="$style.like" @click="handleClick(ELikeOp.LIKE)">
+          <HeartFill v-if="item.isLike" />
+          <Heart1 v-else />
+          <view>{{ `${unlikeText} +${item.likeNum}` }}</view>
         </view>
       </view>
     </view>

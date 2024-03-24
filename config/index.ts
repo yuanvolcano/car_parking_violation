@@ -14,6 +14,8 @@ const config = {
     '@/utils': path.resolve(__dirname, '..', 'src/utils'),
     '@/assets': path.resolve(__dirname, '..', 'src/assets'),
     '@/types': path.resolve(__dirname, '..', 'src/types'),
+    '@/stores': path.resolve(__dirname, '..', 'src/stores'),
+    '@/api': path.resolve(__dirname, '..', 'src/api'),
   },
   designWidth(input) {
     if (input?.file?.replace(/\\+/g, '/').indexOf('@nutui') > -1) {
@@ -71,6 +73,9 @@ const config = {
           generateScopedName: '[name]__[local]___[hash:base64:5]',
         },
       },
+    },
+    miniCssExtractPluginOption: {
+      ignoreOrder: true,
     },
   },
   h5: {

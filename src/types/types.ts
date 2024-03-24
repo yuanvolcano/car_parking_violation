@@ -9,10 +9,11 @@ export interface IBaseInfo {
   nickName: string; // 名称
   carInfo: string; // 车辆信息
   driveYear: number; // 驾龄
+  location: string; // 常停车地
 }
 
 export interface IPostItem extends IBaseInfo {
-  id: string; // 文章ID
+  articleCode: string; // 文章ID
   userId: string; // 文章作者ID
   userLocation: string;
   location: string; // 文章发表位置
@@ -21,4 +22,18 @@ export interface IPostItem extends IBaseInfo {
   fileUrlList: string[];
   likeNum: number; // 点赞数量
   unLikeNum: number; // 踩数量
+  isLike: boolean; // 本人是否点赞
+  isUnlike: boolean; // 本人是否点踩
+}
+
+export enum ELikeOp {
+  LIKE = 1,
+  CANCEL_LIKE = 2,
+  UNLIKE = 3,
+  CANCEL_UNLIKE = 4,
+}
+
+export interface IReqLikeOp {
+  articleCode: string;
+  likeType: ELikeOp;
 }

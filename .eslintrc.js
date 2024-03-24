@@ -159,6 +159,10 @@ module.exports = {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
+      },
+      alias: {
+        map: [['@', './src']],
+        extensions: ['.ts', '.js', '.jsx', '.json'],
       }
     }
   }

@@ -8,8 +8,15 @@ export {}
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     FilterType: typeof import('./src/components/filterType/index.vue')['default']
+    ListItem: typeof import('./src/components/listItem/index.vue')['default']
+    NutActionSheet: typeof import('@nutui/nutui-taro')['ActionSheet']
     NutAvatar: typeof import('@nutui/nutui-taro')['Avatar']
+    NutButton: typeof import('@nutui/nutui-taro')['Button']
+    NutForm: typeof import('@nutui/nutui-taro')['Form']
+    NutFormItem: typeof import('@nutui/nutui-taro')['FormItem']
+    NutInput: typeof import('@nutui/nutui-taro')['Input']
     NutList: typeof import('@nutui/nutui-taro')['List']
+    NutUploader: typeof import('@nutui/nutui-taro')['Uploader']
     PostItem: typeof import('./src/components/postItem/index.vue')['default']
     UserInfo: typeof import('./src/components/userInfo/index.vue')['default']
   }

@@ -1,29 +1,33 @@
 <script setup lang="ts">
+import Taro from '@tarojs/taro';
 import { reactive, ref, useCssModule, computed, onBeforeMount } from 'vue';
 
+import { ARTICLE_LIST, LIKE_OPERATOR } from '@/api';
 import addIconSvg from '@/assets/add.svg';
 import FilterType from '@/components/filterType/index.vue';
 import PostItem from '@/components/postItem/index.vue';
 import UserInfo from '@/components/userInfo/index.vue';
-import { IPostItem } from '@/types/types';
+import { ELikeOp, IPostItem } from '@/types/types';
+
+import { getLocation, getUser } from '../../stores';
 
 defineOptions({
-  name: 'Main',
+  name: 'Home',
 });
 
 const $style = useCssModule();
 
-const userInfo = reactive({
-  headImgUrl: '',
-  nickName: '张三',
-  carInfo: '五菱宏光',
-  driveYear: 3,
+const userInfo = computed(() => {
+  console.log('~~ userInfo', userInfo);
+  return getUser();
 });
 
 const uploadInfo = reactive({
   text: '去上传',
   sum: '累计上传违停次数共{count}条',
 });
+
+const query = ref('');
 
 const uploadCount = ref<string>('6');
 
@@ -36,44 +40,79 @@ const filterType = ref(1);
 
 const list = ref<IPostItem[]>([]);
 
-function getList() {
-  const mockList = [
-    {
-      id: '12', // 文章ID
-      userId: '1', // 文章作者ID
-      nickName: '昵称',
-      headImgUrl: '头像路径',
-      userLocation: '用户位置',
-      carInfo: '车辆信息',
-      driveYear: 1, // 驾龄
-      location: '广州', // 文章发表位置
-      content: '周日早上7点59分在泰安北路被抄牌了，各位兄弟们记得避坑啊！！！！！！！！',
-      createTime: 'yyyy-MM-dd',
-      fileUrlList: ['', ''],
-      likeNum: 100, // 点赞数量
-      unLikeNum: 1, // 踩数量
-    },
-    {
-      id: '11', // 文章ID
-      userId: '2', // 文章作者ID
-      nickName: '昵称',
-      headImgUrl: '头像路径',
-      userLocation: '用户位置',
-      carInfo: '车辆信息',
-      driveYear: 2, // 驾龄
-      location: '佛山', // 文章发表位置
-      content: '周日早上7点59分在泰安北路被抄牌了，各位兄弟们记得避坑啊！！！！！！！！',
-      createTime: 'yyyy-MM-dd',
-      fileUrlList: ['', ''],
-      likeNum: 100, // 点赞数量
-      unLikeNum: 0, // 踩数量
-    },
-  ];
+const locationState = computed<Taro.getLocation.SuccessCallbackResult>(() => {
+  return getLocation() || {};
+});
 
-  list.value = mockList;
+async function getList() {
+  const params = {
+    keyword: query.value,
+    orderBy: filterType.value, // 1-时间，2-距离
+    longitude: locationState.value.longitude || 0,
+    latitude: locationState.value.latitude || 0,
+    nextStartId: 9999999999, // 下次查询的起始文章ID
+  };
+
+  const res = await Taro.request({
+    url: ARTICLE_LIST,
+    data: params,
+  });
+
+  list.value = res.data;
 }
 
 function handleScroll() {}
+
+function handleNavigatePosts() {
+  Taro.navigateTo({
+    url: '/pages/posts/index',
+  });
+}
+
+function handleClick() {
+  Taro.navigateTo({
+    url: '/pages/user/index',
+  });
+}
+
+async function handleLikeOp(val: { likeType: ELikeOp; post: IPostItem }) {
+  const { post, likeType } = val;
+  const params = {
+    likeType,
+    articleCode: val.post.articleCode,
+  };
+
+  await Taro.request({
+    url: LIKE_OPERATOR,
+    data: params,
+  });
+
+  // 更新数据有两种方式： 1. 掉接口数据列表；2. 直接手动更新；这里先用第二种
+  if (!post.isLike && !post.isUnlike) {
+    // 空白
+    if (likeType === ELikeOp.LIKE) {
+      post.likeNum += 1;
+      post.isLike = true;
+    } else {
+      post.unLikeNum += 1;
+      post.isUnlike = true;
+    }
+  } else if (post.isLike) {
+    post.likeNum -= 1;
+    post.isLike = false;
+    if (likeType === ELikeOp.UNLIKE) {
+      post.unLikeNum += 1;
+      post.isUnlike = true;
+    }
+  } else if (post.isUnlike) {
+    post.unLikeNum -= 1;
+    post.isUnlike = false;
+    if (likeType !== ELikeOp.LIKE) {
+      post.likeNum += 1;
+      post.isLike = true;
+    }
+  }
+}
 
 onBeforeMount(() => {
   getList();
@@ -81,11 +120,11 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <view :class="$style.index">
+  <view v-if="list.length" :class="$style.index">
     <!-- 入口 -->
     <view :class="$style.baseInfo">
-      <UserInfo v-bind="userInfo" :class="$style.infoContainer" />
-      <view :class="$style.uploadEntry">
+      <UserInfo v-bind="userInfo" :class="$style.infoContainer" @click="handleClick" />
+      <view :class="$style.uploadEntry" @click="handleNavigatePosts">
         <view :class="$style.upload">
           <view :class="$style.uploadText">{{ uploadInfo.text }}</view>
           <img :class="$style.addSvg" :src="addIconSvg" />
@@ -98,15 +137,20 @@ onBeforeMount(() => {
     <!-- 列表 -->
     <nut-list :class="$style.postList" :list-data="list" @scroll-bottom="handleScroll">
       <template v-slot="{ item }">
-        <PostItem :class="$style.postItem" v-bind="item" />
+        <PostItem :class="$style.postItem" :item="item" @click="handleLikeOp" />
       </template>
     </nut-list>
+  </view>
+
+  <view v-else :class="$style.empty">
+    <view :class="$style.tips">社区运营不宜，</view>
+    <view :class="$style.tips">需上传一条违停记录后才能进入哦~</view>
+    <nut-button :class="$style.goUpload" @click="handleNavigatePosts">去上传</nut-button>
   </view>
 </template>
 
 <style lang="scss" module>
 .index {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -184,6 +228,24 @@ onBeforeMount(() => {
     margin-bottom: 10px;
     background-color: #f4a8b6;
     border-radius: 10px;
+  }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 80rpx;
+  padding: 0 2px;
+  font-size: 32rpx;
+  color: #666;
+
+  .tips {
+    text-align: center;
+  }
+
+  .goUpload {
+    margin-top: 40rpx;
   }
 }
 </style>

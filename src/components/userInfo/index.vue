@@ -17,6 +17,10 @@ interface IProps {
 
 const props = defineProps<IProps>();
 
+const emits = defineEmits<{
+  click: [event: Event];
+}>();
+
 const $style = useCssModule();
 
 const mockCarText = '{carInfo} 驾龄{driveYear}年';
@@ -28,11 +32,15 @@ const realCarInfo = computed(() => {
 const url = computed(() => {
   return props.headImgUrl || avatarSrc;
 });
+
+function handleClick(event: Event) {
+  emits('click', event);
+}
 </script>
 
 <template>
-  <view :class="$style.infoContainer">
-    <nut-avatar :class="$style.avatar" size="normal">
+  <view :class="$style.infoContainer" @click="handleClick">
+    <nut-avatar shape="round" size="normal" :class="$style.avatar">
       <img :src="url" alt="" />
     </nut-avatar>
     <view :class="$style.userInfo">
