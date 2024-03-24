@@ -40,6 +40,8 @@ const filterType = ref(1);
 
 const list = ref<IPostItem[]>([]);
 
+const maxId = ref('');
+
 const locationState = computed<Taro.getLocation.SuccessCallbackResult>(() => {
   return getLocation() || {};
 });
@@ -50,7 +52,7 @@ async function getList() {
     orderBy: filterType.value, // 1-时间，2-距离
     longitude: locationState.value.longitude || 0,
     latitude: locationState.value.latitude || 0,
-    nextStartId: 9999999999, // 下次查询的起始文章ID
+    nextStartId: maxId.value, // 下次查询的起始文章ID
   };
 
   const res = await Taro.request({
@@ -58,10 +60,13 @@ async function getList() {
     data: params,
   });
 
-  list.value = res.data;
+  list.value = res.data.list;
+  maxId.value = res.data.maxId;
 }
 
-function handleScroll() {}
+function handleScroll() {
+  getList();
+}
 
 function handleNavigatePosts() {
   Taro.navigateTo({
