@@ -6,14 +6,6 @@ import { useUserStoreHook } from '@/stores/modules/user';
 
 let userStore: ReturnType<typeof useUserStoreHook>;
 
-export function format(str: string, params: any) {
-  for (const key in params) {
-    str = str.replace(new RegExp('\\{' + key + '\\}', 'g'), params[key]);
-  }
-
-  return str;
-}
-
 export function init() {
   userStore = useUserStoreHook();
   // 获取位置信息
@@ -52,6 +44,7 @@ export function getUserLocation() {
       },
       fail: () => {
         console.log('~~ Taro.getLocation fail');
+        abortAuthorization();
       },
     });
   });

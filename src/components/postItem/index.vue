@@ -21,7 +21,7 @@ const emits = defineEmits<{
 }>();
 
 const userInfo = computed(() => {
-  return pick(props, ['headImgUrl', 'nickName', 'carInfo', 'driveYear']);
+  return pick(props.item, ['headImgUrl', 'nickName', 'carInfo', 'driveYear']);
 });
 
 const $style = useCssModule();

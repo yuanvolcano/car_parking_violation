@@ -10,12 +10,9 @@ defineOptions({
 
 const userStore = useUserStoreHook();
 
-console.log('~~ userStore', userStore);
-
 watch(
   () => userStore.getToken,
   newVal => {
-    console.log('~~ _newValue', newVal);
     if (newVal) {
       Taro.navigateTo({
         url: '/pages/home/index',

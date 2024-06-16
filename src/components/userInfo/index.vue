@@ -2,7 +2,6 @@
 import { computed, useCssModule } from 'vue';
 
 import avatarSrc from '@/assets/qiubilong.jpeg';
-import { format } from '@/utils/common';
 
 defineOptions({
   name: 'UserInfo',
@@ -23,10 +22,9 @@ const emits = defineEmits<{
 
 const $style = useCssModule();
 
-const mockCarText = '{carInfo} 驾龄{driveYear}年';
-
 const realCarInfo = computed(() => {
-  return format(mockCarText, { carInfo: props.carInfo, driveYear: props.driveYear });
+  const carInfo = props.carInfo ? `${props.carInfo} ` : '';
+  return `${carInfo} 驾龄${props.driveYear || 0}年`;
 });
 
 const url = computed(() => {

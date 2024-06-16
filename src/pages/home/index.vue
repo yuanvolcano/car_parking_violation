@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import Taro, { useDidShow, useLoad } from '@tarojs/taro';
+import { IconFont } from '@nutui/icons-vue-taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { reactive, ref, useCssModule, computed } from 'vue';
 
 import { apiArticleList, apiLikeOperate } from '@/api';
@@ -10,6 +11,7 @@ import UserInfo from '@/components/userInfo/index.vue';
 import { useUserStoreHook } from '@/stores/modules/user';
 import { ELikeOp, ILocation, IPostItem } from '@/types/types';
 import { getUserLocation } from '@/utils/common';
+import { throttle } from '@/utils/throttle';
 
 defineOptions({
   name: 'Home',
@@ -30,16 +32,20 @@ const uploadInfo = reactive({
 
 const query = ref('');
 
-const uploadCount = ref<string>('6');
+const queryVisible = ref(false);
+
+const uploadCount = ref<number>(0);
 
 const uploadSumText = computed(() => {
   const countValue = uploadCount.value;
-  return uploadInfo.sum.replace(/\{.+\}/, countValue);
+  return uploadInfo.sum.replace(/\{.+\}/, String(countValue));
 });
 
 const filterType = ref(1);
 
 const list = ref<IPostItem[]>([]);
+
+const lastMaxId = ref(Number.MAX_SAFE_INTEGER);
 
 const maxId = ref(Number.MAX_SAFE_INTEGER);
 
@@ -66,13 +72,17 @@ async function getList() {
 
   const res = await apiArticleList(params);
 
-  list.value = res?.articleList || [];
+  lastMaxId.value = maxId.value;
+
+  list.value = list.value.concat(res?.articleList || []);
   maxId.value = res?.maxId || 0;
 }
 
-function handleScroll() {
-  getList();
-}
+const handleScroll = throttle(() => {
+  if (lastMaxId.value === maxId.value) {
+    getList();
+  }
+}, 200);
 
 function handleNavigatePosts() {
   Taro.navigateTo({
@@ -84,6 +94,32 @@ function handleClick() {
   Taro.navigateTo({
     url: '/pages/user/index',
   });
+}
+
+function resetList() {
+  list.value = [];
+}
+
+function handleSearchIconClick() {
+  queryVisible.value = true;
+}
+
+async function handleQueryConfirm() {
+  queryVisible.value = false;
+  resetList();
+  await handleSearch();
+}
+
+async function handleSearch() {
+  maxId.value = Number.MAX_SAFE_INTEGER;
+  await getList();
+  query.value = '';
+}
+
+function handleFilterTypeUpdate() {
+  maxId.value = Number.MAX_SAFE_INTEGER;
+  resetList();
+  getList();
 }
 
 async function handleLikeOp(val: { likeType: ELikeOp; post: IPostItem }) {
@@ -125,14 +161,10 @@ async function handleLikeOp(val: { likeType: ELikeOp; post: IPostItem }) {
 useDidShow(() => {
   getList();
 });
-
-useLoad(() => {
-  getList();
-});
 </script>
 
 <template>
-  <view v-if="list.length" :class="$style.index">
+  <view v-if="list.length || uploadCount" :class="$style.index">
     <!-- 入口 -->
     <view :class="$style.baseInfo">
       <UserInfo v-bind="userInfo" :class="$style.infoContainer" @click="handleClick" />
@@ -145,7 +177,11 @@ useLoad(() => {
       </view>
     </view>
     <!-- 过滤条件 -->
-    <FilterType v-model="filterType" :class="$style.filterType" />
+    <view :class="$style.search">
+      <FilterType v-model="filterType" :class="$style.filterType" @update:modelValue="handleFilterTypeUpdate" />
+      <IconFont name="search" :class="$style.searchIcon" @click="handleSearchIconClick" />
+      <!-- <nut-searchbar v-model="query" @search="handleSearch" /> -->
+    </view>
     <!-- 列表 -->
     <nut-list :class="$style.postList" :list-data="list" @scroll-bottom="handleScroll">
       <template v-slot="{ item }">
@@ -159,6 +195,13 @@ useLoad(() => {
     <view :class="$style.tips">需上传一条违停记录后才能进入哦~</view>
     <nut-button :class="$style.goUpload" @click="handleNavigatePosts">去上传</nut-button>
   </view>
+
+  <nut-action-sheet v-model:visible="queryVisible" title="搜索">
+    <nut-form :class="$style.form">
+      <nut-searchbar v-model="query" @search="handleSearch" />
+      <nut-button type="info" block :disabled="!query" @click="handleQueryConfirm">保存</nut-button>
+    </nut-form>
+  </nut-action-sheet>
 </template>
 
 <style lang="scss" module>
@@ -214,8 +257,18 @@ useLoad(() => {
     }
   }
 
-  .filterType {
+  .search {
     margin-top: 20rpx;
+    display: flex;
+    align-items: center;
+
+    .filterType {
+      flex: 1;
+    }
+
+    .searchIcon {
+      margin-right: 20rpx;
+    }
   }
 
   .postList {

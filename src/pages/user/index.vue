@@ -47,11 +47,15 @@ async function handleSave() {
     return;
   }
 
-  await apiUserUpdate(editFormData.value);
+  try {
+    await apiUserUpdate(editFormData.value);
 
-  let tempState = userStore.getUser;
-  tempState = Object.assign(cloneDeep(toValue(tempState)), editFormData.value);
-  userStore.setUser(tempState);
+    let tempState = userStore.getUser;
+    tempState = Object.assign(cloneDeep(toValue(tempState)), editFormData.value);
+    userStore.setUser(tempState);
+  } finally {
+    visible.value = false;
+  }
 }
 </script>
 

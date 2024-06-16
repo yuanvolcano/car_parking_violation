@@ -16,6 +16,7 @@ declare module '@vue/runtime-core' {
     NutFormItem: typeof import('@nutui/nutui-taro')['FormItem']
     NutInput: typeof import('@nutui/nutui-taro')['Input']
     NutList: typeof import('@nutui/nutui-taro')['List']
+    NutSearchbar: typeof import('@nutui/nutui-taro')['Searchbar']
     NutTextarea: typeof import('@nutui/nutui-taro')['Textarea']
     NutUploader: typeof import('@nutui/nutui-taro')['Uploader']
     PostItem: typeof import('./src/components/postItem/index.vue')['default']

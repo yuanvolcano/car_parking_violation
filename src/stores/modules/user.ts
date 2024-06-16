@@ -30,7 +30,7 @@ export const useUserStore = defineStore({
       return (this.user || {}) as IBaseInfo;
     },
     getAvatarUrl() {
-      return this.getUser()?.headImgUrl || '';
+      return this.getUser?.headImgUrl || '';
     },
   },
   actions: {
