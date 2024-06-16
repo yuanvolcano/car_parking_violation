@@ -16,6 +16,7 @@ const config = {
     '@/types': path.resolve(__dirname, '..', 'src/types'),
     '@/stores': path.resolve(__dirname, '..', 'src/stores'),
     '@/api': path.resolve(__dirname, '..', 'src/api'),
+    '@/hooks': path.resolve(__dirname, '..', 'src/hooks'),
   },
   designWidth(input) {
     if (input?.file?.replace(/\\+/g, '/').indexOf('@nutui') > -1) {

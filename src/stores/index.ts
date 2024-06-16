@@ -1,40 +1,11 @@
-import Taro from '@tarojs/taro';
-import { reactive } from 'vue';
+import { createPinia } from 'pinia';
 
-import { IBaseInfo, ILocation } from '@/types/types';
+import type { App } from 'vue';
 
-export const state = reactive<{
-  location: ILocation | null;
-  user: IBaseInfo | null;
-}>({
-  user: null,
-  location: null,
-});
+const store = createPinia();
 
-export function setToken(token: string) {
-  Taro.setStorageSync('token', token);
+export function setupStore(app: App<Element>) {
+  app.use(store);
 }
 
-export function getToken() {
-  return Taro.getStorageSync('token');
-}
-
-export function setLocation(location) {
-  state.location = location;
-}
-
-export function getLocation() {
-  return state.location;
-}
-
-export function setUser(userInfo: IBaseInfo) {
-  state.user = userInfo;
-}
-
-export function getUser(): IBaseInfo {
-  return (state.user || {}) as IBaseInfo;
-}
-
-export function getAvatarUrl() {
-  return getUser()?.headImgUrl || '';
-}
+export { store };

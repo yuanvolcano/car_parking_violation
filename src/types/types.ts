@@ -42,3 +42,7 @@ export interface ILocation {
   longitude: number;
   latitude: number;
 }
+
+export enum ECode {
+  TOKEN_OUT = 1001,
+}

@@ -1,9 +1,13 @@
 import Taro from '@tarojs/taro';
 
-import { getToken } from '@/stores';
+import { useUserStoreHook } from '@/stores/modules/user';
+import { ECode } from '@/types/types';
+import { loginFunc } from '@/utils/common';
 
 export function httpPromise<T>(url: string, data, method: 'GET' | 'POST' = 'GET'): Promise<T> {
-  const header = { token: getToken() };
+  const userStore = useUserStoreHook();
+  const header = { token: userStore.getToken };
+
   return new Promise((resolve, reject) => {
     Taro.request({
       url,
@@ -11,7 +15,15 @@ export function httpPromise<T>(url: string, data, method: 'GET' | 'POST' = 'GET'
       header,
       method,
       success(response) {
-        resolve(response.data);
+        const res = response.data;
+        const { code } = res;
+        if (code === 0) {
+          resolve(response.data.data);
+          return;
+        } else if (code === ECode.TOKEN_OUT) {
+          // token 过期需要重新登录
+          loginFunc();
+        }
       },
       fail(...args) {
         reject(args);

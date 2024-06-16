@@ -11,12 +11,8 @@ export interface IReqLogin {
   code: string;
 }
 
-export interface IResLogin {
-  data: string;
-}
-
 export function apiLogin(data: IReqLogin) {
-  return httpPromise<IResLogin>(LOGIN_URL, data, 'POST');
+  return httpPromise<string>(LOGIN_URL, data, 'POST');
 }
 
 /** 更新用户信息 */

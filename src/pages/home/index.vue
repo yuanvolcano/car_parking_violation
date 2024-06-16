@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import Taro, { useDidShow } from '@tarojs/taro';
-import { reactive, ref, useCssModule, computed, toValue } from 'vue';
+import Taro, { useDidShow, useLoad } from '@tarojs/taro';
+import { reactive, ref, useCssModule, computed } from 'vue';
 
 import { apiArticleList, apiLikeOperate } from '@/api';
 import addIconSvg from '@/assets/add.svg';
 import FilterType from '@/components/filterType/index.vue';
 import PostItem from '@/components/postItem/index.vue';
 import UserInfo from '@/components/userInfo/index.vue';
+import { useUserStoreHook } from '@/stores/modules/user';
 import { ELikeOp, ILocation, IPostItem } from '@/types/types';
-
-import { getLocation, getUser } from '../../stores';
+import { getUserLocation } from '@/utils/common';
 
 defineOptions({
   name: 'Home',
@@ -17,9 +17,10 @@ defineOptions({
 
 const $style = useCssModule();
 
+const userStore = useUserStoreHook();
+
 const userInfo = computed(() => {
-  console.log('~~ userInfo', userInfo);
-  return getUser();
+  return userStore.getUser;
 });
 
 const uploadInfo = reactive({
@@ -40,25 +41,33 @@ const filterType = ref(1);
 
 const list = ref<IPostItem[]>([]);
 
-const maxId = ref(0);
+const maxId = ref(Number.MAX_SAFE_INTEGER);
 
 const locationState = computed<ILocation>(() => {
-  return toValue(getLocation());
+  return userStore.getLocation;
 });
 
 async function getList() {
+  if (!userStore.getToken) {
+    return;
+  }
+  // 等待拉取用户
+  if (!locationState.value) {
+    await getUserLocation();
+  }
+
   const params = {
     keyword: query.value,
     orderBy: filterType.value, // 1-时间，2-距离
-    longitude: locationState.value.longitude || 0,
-    latitude: locationState.value.latitude || 0,
+    longitude: locationState.value?.longitude || 0,
+    latitude: locationState.value?.latitude || 0,
     nextStartId: maxId.value, // 下次查询的起始文章ID
   };
 
   const res = await apiArticleList(params);
 
-  list.value = res.articleList || [];
-  maxId.value = res.maxId || 0;
+  list.value = res?.articleList || [];
+  maxId.value = res?.maxId || 0;
 }
 
 function handleScroll() {
@@ -114,6 +123,10 @@ async function handleLikeOp(val: { likeType: ELikeOp; post: IPostItem }) {
 }
 
 useDidShow(() => {
+  getList();
+});
+
+useLoad(() => {
   getList();
 });
 </script>

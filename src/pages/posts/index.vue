@@ -3,11 +3,13 @@ import Taro from '@tarojs/taro';
 import { computed, ref } from 'vue';
 
 import { apiArticleSave, FILE_UPLOAD } from '@/api';
-import { getLocation, getToken, getUser } from '@/stores';
+import { useUserStoreHook } from '@/stores/modules/user';
 
 defineOptions({
   name: 'Posts',
 });
+
+const userStore = useUserStoreHook();
 
 const placeholder = '向大家分享违停的时间、地方，以及你的感受吧......';
 
@@ -27,7 +29,7 @@ function beforeUpload(taroUploadFile, options) {
   taroUploadFile({
     url: FILE_UPLOAD,
     header: {
-      token: getToken(),
+      token: userStore.getToken,
     },
     filePath: options.taroFilePath,
     fileType: options.fileType,
@@ -53,9 +55,9 @@ async function handleSubmit() {
   const params = {
     title: '',
     content: postContent.value,
-    location: getUser().location,
-    latitude: getLocation()?.latitude || 0,
-    longitude: getLocation()?.longitude || 0,
+    location: userStore.getUser.location,
+    latitude: userStore.getLocation?.latitude || 0,
+    longitude: userStore.getLocation?.longitude || 0,
     fileUrlList: fileList.value,
   };
   await apiArticleSave(params);

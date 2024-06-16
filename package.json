@@ -62,6 +62,7 @@
     "lint-staged": "13.2.3",
     "listr2": "5.0.8",
     "lodash-es": "^4.17.21",
+    "pinia": "^2.1.7",
     "vue": "^3.2.40"
   },
   "devDependencies": {

@@ -4,13 +4,16 @@ import { computed, ref, toValue } from 'vue';
 
 import { apiUserUpdate } from '@/api';
 import ListItem from '@/components/listItem/index.vue';
+import { useUserStoreHook } from '@/stores/modules/user';
 
-import { getAvatarUrl, getUser, setUser } from '../../stores';
-
-const avatarUrl = getAvatarUrl();
+const userStore = useUserStoreHook();
 
 const userInfo = computed(() => {
-  return getUser();
+  return userStore.getUser;
+});
+
+const avatarUrl = computed(() => {
+  return userStore.getAvatarUrl;
 });
 
 const formData = computed(() => {
@@ -46,9 +49,9 @@ async function handleSave() {
 
   await apiUserUpdate(editFormData.value);
 
-  let tempState = getUser();
-  tempState = Object.assign(cloneDeep(tempState), editFormData.value);
-  setUser(tempState);
+  let tempState = userStore.getUser;
+  tempState = Object.assign(cloneDeep(toValue(tempState)), editFormData.value);
+  userStore.setUser(tempState);
 }
 </script>
 
