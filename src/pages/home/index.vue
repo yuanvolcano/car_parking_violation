@@ -169,7 +169,7 @@ async function handleLikeOp(val: { likeType: ELikeOp; post: IPostItem }) {
 }
 
 function handleOpenPreview(params: { index: number; list: string[] }) {
-  previewList.value = params.list?.map(src => ({ src }));
+  previewList.value = params.list?.filter(item => !!item).map(src => ({ src }));
   imagePreviewVisible.value = true;
   previewIndex.value = params.index;
 }
