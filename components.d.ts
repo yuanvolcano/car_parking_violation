@@ -14,6 +14,7 @@ declare module '@vue/runtime-core' {
     NutButton: typeof import('@nutui/nutui-taro')['Button']
     NutForm: typeof import('@nutui/nutui-taro')['Form']
     NutFormItem: typeof import('@nutui/nutui-taro')['FormItem']
+    NutImagePreview: typeof import('@nutui/nutui-taro')['ImagePreview']
     NutInput: typeof import('@nutui/nutui-taro')['Input']
     NutList: typeof import('@nutui/nutui-taro')['List']
     NutSearchbar: typeof import('@nutui/nutui-taro')['Searchbar']

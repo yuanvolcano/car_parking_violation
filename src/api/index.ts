@@ -89,3 +89,14 @@ export function apiArticleSave(data: IReqArticleSave) {
 
 /** 上传文件 */
 export const FILE_UPLOAD = `${BASE_URL}/file/upload`;
+
+/** 获取用户累计上传次数 */
+export const UPLOAD_NUM = `${BASE_URL}/user/getUploadNum`;
+
+export interface IResGetUploadNum {
+  uploadNum: number;
+}
+
+export function apiGetUploadNum() {
+  return httpPromise<IResGetUploadNum>(UPLOAD_NUM, {}, 'GET');
+}

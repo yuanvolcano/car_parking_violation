@@ -18,6 +18,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   click: [val: { likeType: ELikeOp; post: IPostItem }];
+  'preview-image': [val: { index: number; list: string[] }];
 }>();
 
 const userInfo = computed(() => {
@@ -30,7 +31,7 @@ const likeText = '真实';
 
 const unlikeText = '虚假';
 
-function handleClick(type: ELikeOp) {
+function handleLikeClick(type: ELikeOp) {
   let op = ELikeOp.LIKE;
   if (type === ELikeOp.LIKE) {
     op = props.item.isLike ? ELikeOp.CANCEL_LIKE : ELikeOp.LIKE;
@@ -40,6 +41,11 @@ function handleClick(type: ELikeOp) {
 
   emits('click', { likeType: op, post: props.item });
 }
+
+// 图片预览
+function handleImgClick(index: number) {
+  emits('preview-image', { index, list: props.item.fileUrlList });
+}
 </script>
 
 <template>
@@ -47,16 +53,24 @@ function handleClick(type: ELikeOp) {
     <UserInfo v-bind="userInfo" />
     <view :class="$style.content">{{ item.content }}</view>
     <view :class="$style.imgContainer">
-      <img :class="$style.imgItem" v-for="imgItem in item.fileUrlList" :key="imgItem" :src="imgItem || avatarSrc" />
+      <img
+        :class="$style.imgItem"
+        v-for="(imgItem, index) in item.fileUrlList"
+        :key="imgItem"
+        :src="imgItem || avatarSrc"
+        @click="handleImgClick(index)"
+      />
+      <!-- <view :class="$style.imgWrapper">
+      </view> -->
     </view>
     <view :class="$style.feedback">
       <view :class="$style.time">{{ item.createTime }} {{ item.location }}</view>
       <view :class="$style.likeOrUnlike">
-        <view :class="$style.like" @click="handleClick(ELikeOp.UNLIKE)">
+        <view :class="$style.like" @click="handleLikeClick(ELikeOp.UNLIKE)">
           <img :class="$style.opposeImg" :src="opposeUrl" />
           <view>{{ `${likeText} +${item.unLikeNum}` }}</view>
         </view>
-        <view :class="$style.like" @click="handleClick(ELikeOp.LIKE)">
+        <view :class="$style.like" @click="handleLikeClick(ELikeOp.LIKE)">
           <HeartFill v-if="item.isLike" />
           <Heart1 v-else />
           <view>{{ `${unlikeText} +${item.likeNum}` }}</view>
@@ -76,9 +90,12 @@ function handleClick(type: ELikeOp) {
 
   .imgContainer {
     display: flex;
+    flex-wrap: nowrap;
     height: 160rpx;
+    overflow-x: auto;
 
     .imgItem {
+      flex: 0 0 160rpx;
       height: 160rpx;
       width: 160rpx;
       margin-right: 10rpx;

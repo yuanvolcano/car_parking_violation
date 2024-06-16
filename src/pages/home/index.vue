@@ -3,7 +3,7 @@ import { IconFont } from '@nutui/icons-vue-taro';
 import Taro, { useDidShow } from '@tarojs/taro';
 import { reactive, ref, useCssModule, computed } from 'vue';
 
-import { apiArticleList, apiLikeOperate } from '@/api';
+import { apiArticleList, apiGetUploadNum, apiLikeOperate } from '@/api';
 import addIconSvg from '@/assets/add.svg';
 import FilterType from '@/components/filterType/index.vue';
 import PostItem from '@/components/postItem/index.vue';
@@ -48,6 +48,12 @@ const list = ref<IPostItem[]>([]);
 const lastMaxId = ref(Number.MAX_SAFE_INTEGER);
 
 const maxId = ref(Number.MAX_SAFE_INTEGER);
+
+const imagePreviewVisible = ref(false);
+
+const previewList = ref<{ src: string }[]>([]);
+
+const previewIndex = ref(0);
 
 const locationState = computed<ILocation>(() => {
   return userStore.getLocation;
@@ -122,6 +128,10 @@ function handleFilterTypeUpdate() {
   getList();
 }
 
+function hidePreview() {
+  imagePreviewVisible.value = false;
+}
+
 async function handleLikeOp(val: { likeType: ELikeOp; post: IPostItem }) {
   const { post, likeType } = val;
   const params = {
@@ -158,7 +168,20 @@ async function handleLikeOp(val: { likeType: ELikeOp; post: IPostItem }) {
   }
 }
 
+function handleOpenPreview(params: { index: number; list: string[] }) {
+  previewList.value = params.list?.map(src => ({ src }));
+  imagePreviewVisible.value = true;
+  previewIndex.value = params.index;
+}
+
+async function fetchUploadNum() {
+  const res = await apiGetUploadNum();
+  uploadCount.value = res.uploadNum;
+}
+
 useDidShow(() => {
+  maxId.value = Number.MAX_SAFE_INTEGER;
+  fetchUploadNum();
   getList();
 });
 </script>
@@ -185,7 +208,7 @@ useDidShow(() => {
     <!-- 列表 -->
     <nut-list :class="$style.postList" :list-data="list" @scroll-bottom="handleScroll">
       <template v-slot="{ item }">
-        <PostItem :class="$style.postItem" :item="item" @click="handleLikeOp" />
+        <PostItem :class="$style.postItem" :item="item" @click="handleLikeOp" @preview-image="handleOpenPreview" />
       </template>
     </nut-list>
   </view>
@@ -202,6 +225,9 @@ useDidShow(() => {
       <nut-button type="info" block :disabled="!query" @click="handleQueryConfirm">保存</nut-button>
     </nut-form>
   </nut-action-sheet>
+
+  <!-- 图片预览 -->
+  <nut-image-preview :show="imagePreviewVisible" :images="previewList" :init-no="previewIndex" @close="hidePreview" />
 </template>
 
 <style lang="scss" module>
