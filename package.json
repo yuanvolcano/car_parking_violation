@@ -27,6 +27,7 @@
     "dev:qq": "pnpm run build:qq -- --watch",
     "dev:jd": "pnpm run build:jd -- --watch",
     "dev:quickapp": "pnpm run build:quickapp -- --watch",
+    "dev": "NODE_ENV=production taro build --type weapp --watch",
     "tsc": "vue-tsc --noEmit --skipLibCheck",
     "lint:eslint": "eslint --cache --max-warnings 0  \"src/**/*.{vue,js,ts,tsx}\" --fix",
     "lint:prettier": "prettier --write  \"src/**/*.{js,ts,json,tsx,css,scss,vue,html,md}\"",

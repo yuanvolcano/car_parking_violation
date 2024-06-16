@@ -37,3 +37,8 @@ export interface IReqLikeOp {
   articleCode: string;
   likeType: ELikeOp;
 }
+
+export interface ILocation {
+  longitude: number;
+  latitude: number;
+}

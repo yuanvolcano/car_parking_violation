@@ -1,4 +1,5 @@
 import Taro from '@tarojs/taro';
+import { pick } from 'lodash-es';
 
 import { setLocation } from '@/stores';
 
@@ -13,7 +14,9 @@ export function format(str: string, params: any) {
 export function getUserLocation() {
   Taro.getLocation({
     success: function (locationRes) {
-      setLocation(locationRes);
+      console.log('~~ locationRes', locationRes);
+      const locationInfo = pick(locationRes, ['latitude', 'longitude']);
+      setLocation(locationInfo);
     },
     fail: function (error) {
       console.log('~~ error', error);

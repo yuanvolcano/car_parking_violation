@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import Taro from '@tarojs/taro';
 import { pick, cloneDeep } from 'lodash-es';
 import { computed, ref, toValue } from 'vue';
 
-import { SAVE_USER_INFO } from '@/api';
+import { apiUserUpdate } from '@/api';
 import ListItem from '@/components/listItem/index.vue';
 
 import { getAvatarUrl, getUser, setUser } from '../../stores';
@@ -45,10 +44,7 @@ async function handleSave() {
     return;
   }
 
-  await Taro.request({
-    url: SAVE_USER_INFO,
-    data: editFormData.value,
-  });
+  await apiUserUpdate(editFormData.value);
 
   let tempState = getUser();
   tempState = Object.assign(cloneDeep(tempState), editFormData.value);

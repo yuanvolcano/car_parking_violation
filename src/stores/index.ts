@@ -1,29 +1,23 @@
+import Taro from '@tarojs/taro';
 import { reactive } from 'vue';
 
-import { IBaseInfo } from '@/types/types';
+import { IBaseInfo, ILocation } from '@/types/types';
 
-// export const state: { user: IBaseInfo | null } = {
-//   user: {
-//     // headImgUrl: 'https://c-ssl.duitang.com/uploads/blog/202209/19/20220919181424_308ce.jpg',
-//     headImgUrl: '',
-//     nickName: '秋名山车神',
-//     carInfo: '五菱宾果，车辆信息',
-//     driveYear: 1, // 驾龄
-//     location: '常停地址',
-//   },
-// };
-
-export const state = reactive({
-  user: {
-    // headImgUrl: 'https://c-ssl.duitang.com/uploads/blog/202209/19/20220919181424_308ce.jpg',
-    headImgUrl: '',
-    nickName: '秋名山车神',
-    carInfo: '五菱宾果，车辆信息',
-    driveYear: 1, // 驾龄
-    location: '常停地址',
-  },
+export const state = reactive<{
+  location: ILocation | null;
+  user: IBaseInfo | null;
+}>({
+  user: null,
   location: null,
 });
+
+export function setToken(token: string) {
+  Taro.setStorageSync('token', token);
+}
+
+export function getToken() {
+  return Taro.getStorageSync('token');
+}
 
 export function setLocation(location) {
   state.location = location;

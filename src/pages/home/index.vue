@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import Taro from '@tarojs/taro';
-import { reactive, ref, useCssModule, computed, onBeforeMount } from 'vue';
+import Taro, { useDidShow } from '@tarojs/taro';
+import { reactive, ref, useCssModule, computed, toValue } from 'vue';
 
-import { ARTICLE_LIST, LIKE_OPERATOR } from '@/api';
+import { apiArticleList, apiLikeOperate } from '@/api';
 import addIconSvg from '@/assets/add.svg';
 import FilterType from '@/components/filterType/index.vue';
 import PostItem from '@/components/postItem/index.vue';
 import UserInfo from '@/components/userInfo/index.vue';
-import { ELikeOp, IPostItem } from '@/types/types';
+import { ELikeOp, ILocation, IPostItem } from '@/types/types';
 
 import { getLocation, getUser } from '../../stores';
 
@@ -40,10 +40,10 @@ const filterType = ref(1);
 
 const list = ref<IPostItem[]>([]);
 
-const maxId = ref('');
+const maxId = ref(0);
 
-const locationState = computed<Taro.getLocation.SuccessCallbackResult>(() => {
-  return getLocation() || {};
+const locationState = computed<ILocation>(() => {
+  return toValue(getLocation());
 });
 
 async function getList() {
@@ -55,13 +55,10 @@ async function getList() {
     nextStartId: maxId.value, // 下次查询的起始文章ID
   };
 
-  const res = await Taro.request({
-    url: ARTICLE_LIST,
-    data: params,
-  });
+  const res = await apiArticleList(params);
 
-  list.value = res.data.list;
-  maxId.value = res.data.maxId;
+  list.value = res.articleList || [];
+  maxId.value = res.maxId || 0;
 }
 
 function handleScroll() {
@@ -87,39 +84,36 @@ async function handleLikeOp(val: { likeType: ELikeOp; post: IPostItem }) {
     articleCode: val.post.articleCode,
   };
 
-  await Taro.request({
-    url: LIKE_OPERATOR,
-    data: params,
-  });
+  const res = await apiLikeOperate(params);
 
   // 更新数据有两种方式： 1. 掉接口数据列表；2. 直接手动更新；这里先用第二种
   if (!post.isLike && !post.isUnlike) {
     // 空白
     if (likeType === ELikeOp.LIKE) {
-      post.likeNum += 1;
+      post.likeNum = res.likeNum;
       post.isLike = true;
     } else {
-      post.unLikeNum += 1;
+      post.unLikeNum = res.unLikeNum;
       post.isUnlike = true;
     }
   } else if (post.isLike) {
-    post.likeNum -= 1;
+    post.likeNum = res.likeNum;
     post.isLike = false;
     if (likeType === ELikeOp.UNLIKE) {
-      post.unLikeNum += 1;
+      post.unLikeNum = res.unLikeNum;
       post.isUnlike = true;
     }
   } else if (post.isUnlike) {
-    post.unLikeNum -= 1;
+    post.unLikeNum = res.unLikeNum;
     post.isUnlike = false;
     if (likeType !== ELikeOp.LIKE) {
-      post.likeNum += 1;
+      post.likeNum = res.likeNum;
       post.isLike = true;
     }
   }
 }
 
-onBeforeMount(() => {
+useDidShow(() => {
   getList();
 });
 </script>

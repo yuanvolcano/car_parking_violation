@@ -2,18 +2,35 @@ import Taro from '@tarojs/taro';
 import { createApp } from 'vue';
 
 import './app.scss';
-import { LOGIN_URL } from './api';
-import { setUser } from './stores';
+import { apiLogin } from './api';
+import { getToken, setToken, setUser } from './stores';
 import { getUserLocation } from './utils/common';
 
 const App = createApp({
   onShow(_options) {
+    const token = getToken();
+    if (!token) {
+      Taro.login({
+        success: async function (loginRes) {
+          if (loginRes.code) {
+            //发起网络请求
+            const params = {
+              code: loginRes.code,
+            };
+            const successTip = await apiLogin(params);
+            setToken(successTip.data);
+          } else {
+            console.log('登录失败！' + loginRes.errMsg);
+          }
+        },
+      });
+    }
+
     // 是否注册
     Taro.checkSession({
       success: function () {
         Taro.getUserInfo({
           success: function (res) {
-            console.log('~~ res', res);
             const { userInfo } = res;
             const { country = '', province = '', city = '' } = userInfo;
             const params = {
@@ -25,30 +42,6 @@ const App = createApp({
             };
 
             setUser(params);
-          },
-        });
-      },
-      fail: function () {
-        // session_key 已经失效，需要重新执行登录流程
-        Taro.login({
-          success: function (loginRes) {
-            if (loginRes.code) {
-              //发起网络请求
-              Taro.request({
-                url: LOGIN_URL,
-                data: {
-                  code: loginRes.code,
-                },
-                success: function (successTip) {
-                  console.log('~~', successTip);
-                },
-                fail: function (err) {
-                  console.log('~~ ', err);
-                },
-              });
-            } else {
-              console.log('登录失败！' + loginRes.errMsg);
-            }
           },
         });
       },

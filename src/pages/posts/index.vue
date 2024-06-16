@@ -1,59 +1,115 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import Taro from '@tarojs/taro';
+import { computed, ref } from 'vue';
+
+import { apiArticleSave, FILE_UPLOAD } from '@/api';
+import { getLocation, getToken, getUser } from '@/stores';
 
 defineOptions({
   name: 'Posts',
 });
 
-const text = '向大家分享违停的时间、地方，以及你的感受吧......';
+const placeholder = '向大家分享违停的时间、地方，以及你的感受吧......';
+
+const postContent = ref('');
 
 const publish = '发表';
 
-const uploadUrl = '/uploader';
+const uploadRef = ref(null);
 
-const fileList = ref([
-  'https://c-ssl.duitang.com/uploads/blog/202209/19/20220919181424_308ce.jpg',
-  'https://c-ssl.duitang.com/uploads/blog/202209/19/20220919181424_3fa07.jpg',
-]);
+const fileList = ref<string[]>([]);
 
-function handleSubmit() {}
+const disabledSubmitBtn = computed(() => {
+  return !fileList.value?.length || !postContent.value.length;
+});
+
+function beforeUpload(taroUploadFile, options) {
+  taroUploadFile({
+    url: FILE_UPLOAD,
+    header: {
+      token: getToken(),
+    },
+    filePath: options.taroFilePath,
+    fileType: options.fileType,
+    formData: options.formData,
+    name: options.name,
+    success(response: { errMsg; statusCode; data }) {
+      if (options.xhrState == response.statusCode) {
+        options.onSuccess?.(response, options);
+        console.log('~~ ', response);
+        const data = JSON.parse(response.data) || { data: '' };
+        fileList.value.push(data.data);
+      } else {
+        options.onFailure?.(response, options);
+      }
+    },
+    fail(e) {
+      options.onFailure?.(e, options);
+    },
+  });
+}
+
+async function handleSubmit() {
+  const params = {
+    title: '',
+    content: postContent.value,
+    location: getUser().location,
+    latitude: getLocation()?.latitude || 0,
+    longitude: getLocation()?.longitude || 0,
+    fileUrlList: fileList.value,
+  };
+  await apiArticleSave(params);
+  Taro.navigateBack();
+}
 </script>
 
 <template>
   <view :class="$style.postsContainer">
-    <view :class="$style.text">
-      {{ text }}
+    <nut-textarea
+      v-model="postContent"
+      limit-show
+      :class="$style.content"
+      :placeholder="placeholder"
+      :rows="2"
+      :autofocus="true"
+      :max-length="100"
+    />
+
+    <nut-uploader
+      ref="uploadRef"
+      multiple
+      name="uploadFile"
+      :class="$style.uploadList"
+      :maximum="9"
+      :media-typ="['image']"
+      :before-xhr-upload="beforeUpload"
+    />
+
+    <view :class="$style.submitBtn">
+      <nut-button type="success" :disabled="disabledSubmitBtn" @click="handleSubmit">
+        {{ publish }}
+      </nut-button>
     </view>
-
-    <nut-uploader v-model:file-list="fileList" :url="uploadUrl" :maximum="9" :media-typ="['image']" multiple />
-
-    <nut-button type="success" :disabled="!fileList.length" @click="handleSubmit">{{ publish }}</nut-button>
   </view>
 </template>
 
 <style lang="scss" module>
 .postsContainer {
-  width: 100%;
   height: 100%;
   padding: 0 20rpx;
   background-color: #e2e0e0;
+  overflow: auto;
 
-  .text {
+  .uploadList {
+    margin-top: 20rpx;
     display: flex;
-    align-items: center;
-    padding: 20rpx 0;
-    font-size: 24rpx;
-    color: #666;
-  }
-
-  .upload {
-    width: 160rpx;
-    height: 160rpx;
-    display: flex;
-    justify-content: center;
     align-items: center;
     background: #d8d8d8;
     border-radius: 8rpx;
+  }
+
+  .submitBtn {
+    margin-top: 20rpx;
   }
 }
 </style>
