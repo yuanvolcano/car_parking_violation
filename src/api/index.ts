@@ -2,7 +2,7 @@ import { ELikeOp, IPostItem } from '@/types/types';
 
 import { httpPromise } from './http-instance';
 
-export const BASE_URL = 'http://121.41.226.90:8080';
+export const BASE_URL = 'https://www.jiahaitong.com';
 
 /** 登录 */
 export const LOGIN_URL = `${BASE_URL}/login/loginOrRegister`;
